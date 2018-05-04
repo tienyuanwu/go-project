@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -23,6 +24,8 @@ var tables = map[string][]float64{
 }
 
 func getRecord(context *gin.Context) {
+	fmt.Println("log")
+
 	keys := make([]int, len(database))
 
 	i := 0
