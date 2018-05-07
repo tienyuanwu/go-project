@@ -83,16 +83,23 @@ func getChart3d(context *gin.Context) {
 
 func addRecord(context *gin.Context) {
 	var json Record
-	if err := context.ShouldBindJSON(&json); err == nil {
-		counter += 1
-		database[counter] = json
-
-		context.JSON(http.StatusOK, gin.H{
-			"success": true,
-			"id":      counter,
-		})
-
-	} else {
+	if err := context.ShouldBindJSON(&json); err != nil {
 		context.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
+
+	for _, item := range json.Datas {
+		if len(item.Vectors) != 6 {
+			context.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
+	}
+
+	counter += 1
+	database[counter] = json
+
+	context.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"id":      counter,
+	})
 }
