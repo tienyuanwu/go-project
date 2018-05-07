@@ -18,3 +18,36 @@ func queryInt(key string, context *gin.Context) (int, bool) {
 
 	return value, true
 }
+
+func getSurface3dChartData(table []float64, record Record) [][]int {
+	datas := [][]int{
+		{0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0},
+	}
+
+	for _, item := range record.Datas {
+		above := 0
+		below := 0
+		for i := 0; i < 6; i++ {
+			line := 1
+			if item.Vectors[i] > table[i] {
+				line = 0
+			}
+
+			if i < 3 {
+				below |= line << uint(2-i)
+			} else {
+				above |= line << uint(5-i)
+			}
+		}
+		datas[above][below] += item.Length
+	}
+
+	return datas
+}

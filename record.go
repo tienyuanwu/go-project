@@ -23,6 +23,17 @@ var tables = map[string][]float64{
 	"1": {0.5, 0.5, 0.5, 0.5, 0.5, 0.5},
 }
 
+var hexagram = [][]string{
+	{"乾", "履", "同人", "無妄", "姤", "訟", "遁", "否"},
+	{"夬", "兑", "革", "隨", "大過", "困", "咸", "萃"},
+	{"大有", "睽", "離", "噬嗑", "鼎", "未濟", "旅", "晉"},
+	{"大壯", "歸妹", "豐", "震", "恆", "解", "小過", "豫"},
+	{"小畜", "中孚", "家人", "益", "巽", "渙", "漸", "觀"},
+	{"需", "節", "既濟", "屯", "井", "坎", "蹇", "比"},
+	{"大畜", "損", "賁", "頤", "蠱", "蒙", "艮", "剝"},
+	{"泰", "臨", "明夷", "復", "升", "師", "謙", "坤"},
+}
+
 func getRecord(context *gin.Context) {
 	fmt.Println("log")
 
@@ -68,39 +79,6 @@ func getChart3d(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{
 		"datas": datas,
 	})
-}
-
-func getSurface3dChartData(table []float64, record Record) [][]int {
-	datas := [][]int{
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-		{0, 0, 0, 0, 0, 0, 0, 0},
-	}
-
-	for _, item := range record.Datas {
-		above := 0
-		below := 0
-		for i := 0; i < 6; i++ {
-			line := 1
-			if item.Vectors[i] > table[i] {
-				line = 0
-			}
-
-			if i < 3 {
-				below |= line << uint(2-i)
-			} else {
-				above |= line << uint(5-i)
-			}
-		}
-		datas[above][below] += item.Length
-	}
-
-	return datas
 }
 
 func addRecord(context *gin.Context) {
