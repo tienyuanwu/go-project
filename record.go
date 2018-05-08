@@ -19,6 +19,7 @@ var counter = 0
 var database = map[int]Record{}
 var tables = map[string][]float64{
 	"1": {0.5, 0.5, 0.5, 0.5, 0.5, 0.5},
+	"2": {0.5, 0.5, 50, 50, 50, 50},
 }
 
 var hexagram = [][]string{
