@@ -36,7 +36,7 @@ func getSurface3dChartData(table []float64, record Record) [][]int {
 		below := 0
 		for i := 0; i < 6; i++ {
 			line := 1
-			if item.Vectors[i] > table[i] {
+			if item.Vectors[i] < table[i] {
 				line = 0
 			}
 
@@ -46,7 +46,7 @@ func getSurface3dChartData(table []float64, record Record) [][]int {
 				above |= line << uint(5-i)
 			}
 		}
-		datas[above][below] += item.Length
+		datas[above][below] += 1
 	}
 
 	return datas

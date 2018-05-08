@@ -9,8 +9,6 @@ import (
 type RecordItem struct {
 	Timestamp float64   `form:"timestamp" json:"timestamp" binding:"required"`
 	Vectors   []float64 `form:"vectors" json:"vectors" binding:"required"`
-	Length    int       `form:"length" json:"length" binding:"required"`
-	Table     string    `form:"table" json:"table" binding:"required"`
 }
 
 type Record struct {

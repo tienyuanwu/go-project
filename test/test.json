@@ -1,34 +1,24 @@
 {
 	"datas": [
 		{
-			"timestamp":1,
-			"vectors":[1,1,1,1,1,1],
-			"length":1,
-			"table":"1"
+			"timestamp": 0,
+			"vectors": [1,1,1,0,0,0]
 		},
 		{
-			"timestamp":2,
-			"vectors":[1,1,0,1,1,0],
-			"length":2,
-			"table":"1"
+			"timestamp": 1,
+			"vectors": [1,0,0,0,1,1]
 		},
 		{
-			"timestamp":3,
-			"vectors":[1,0,1,1,0,1],
-			"length":3,
-			"table":"1"
+			"timestamp": 2,
+			"vectors": [0,1,0,1,0,1]
 		},
 		{
-			"timestamp":4,
-			"vectors":[1,1,0,1,1,0],
-			"length":4,
-			"table":"1"
+			"timestamp": 3,
+			"vectors": [0,0,1,1,1,0]
 		},
 		{
-			"timestamp":5,
-			"vectors":[0,1,0,0,1,0],
-			"length":5,
-			"table":"1"
+			"timestamp": 4,
+			"vectors": [0,0,1,1,1,0]
 		}
-		]
+	]
 }
