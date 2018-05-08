@@ -15,6 +15,11 @@ type Record struct {
 	Datas []RecordItem `form:"datas" json:"datas" binding:"required"`
 }
 
+type HexagramItem struct {
+	Hexagram string `form:"hexagram" json:"hexagram" binding:"required"`
+	Value    int    `form:"value" json:"value" binding:"required"`
+}
+
 var counter = 0
 var database = map[int]Record{}
 var tables = map[string][]float64{
@@ -48,36 +53,74 @@ func getRecord(context *gin.Context) {
 	})
 }
 
-func getChart3d(context *gin.Context) {
-	id, ok := queryInt("id", context)
+func getRecordFrequency(context *gin.Context) {
+	id, key, ok := checkIdAndTable(context)
 	if !ok {
-		context.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
 	record, ok := database[id]
-	if !ok {
-		context.AbortWithStatus(http.StatusBadRequest)
-		return
-	}
-
-	key := context.Query("table")
-	if key == "" {
-		context.AbortWithStatus(http.StatusBadRequest)
-		return
-	}
-
 	table, ok := tables[key]
+	datas := getSurface3dChartData(table, record)
+
+	var array []HexagramItem
+	for i := 0; i < 8; i++ {
+		for j := 0; j < 8; j++ {
+			if datas[i][j] == 0 {
+				continue
+			}
+			item := HexagramItem{
+				Hexagram: hexagram[i][j],
+				Value:    datas[i][j],
+			}
+			array = append(array, item)
+		}
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"datas": array,
+	})
+}
+
+func getChart3d(context *gin.Context) {
+	id, key, ok := checkIdAndTable(context)
 	if !ok {
-		context.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
+	record, ok := database[id]
+	table, ok := tables[key]
 	datas := getSurface3dChartData(table, record)
 
 	context.JSON(http.StatusOK, gin.H{
 		"datas": datas,
 	})
+}
+
+func checkIdAndTable(context *gin.Context) (int, string, bool) {
+	id, ok := queryInt("id", context)
+	if !ok {
+		context.AbortWithStatus(http.StatusBadRequest)
+		return -1, "", false
+	}
+
+	if _, ok := database[id]; !ok {
+		context.AbortWithStatus(http.StatusBadRequest)
+		return -1, "", false
+	}
+
+	key := context.Query("table")
+	if key == "" {
+		context.AbortWithStatus(http.StatusBadRequest)
+		return -1, "", false
+	}
+
+	if _, ok := tables[key]; !ok {
+		context.AbortWithStatus(http.StatusBadRequest)
+		return -1, "", false
+	}
+
+	return id, key, true
 }
 
 func addRecord(context *gin.Context) {

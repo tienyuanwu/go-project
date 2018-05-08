@@ -12,6 +12,7 @@ func InitRouter(router *gin.Engine) {
 		v1.GET("/record", getRecord)
 		v1.POST("/record", addRecord)
 		v1.GET("/chart3d", getChart3d)
+		v1.GET("/recordFreq", getRecordFrequency)
 	}
 }
 
