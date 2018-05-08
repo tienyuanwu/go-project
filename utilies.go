@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"strconv"
 )
@@ -36,9 +37,10 @@ func getSurface3dChartData(table []float64, record Record) [][]int {
 		below := 0
 		for i := 0; i < 6; i++ {
 			line := 1
-			if item.Vectors[i] < table[i] {
+			if item.Vectors[i] > table[i] {
 				line = 0
 			}
+			fmt.Println(item.Vectors[i], table[i], line)
 
 			if i < 3 {
 				below |= line << uint(2-i)
