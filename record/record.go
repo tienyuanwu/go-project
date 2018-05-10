@@ -1,4 +1,4 @@
-package main
+package record
 
 import (
 	"fmt"
@@ -38,7 +38,7 @@ var hexagram = [][]string{
 	{"泰", "臨", "明夷", "復", "升", "師", "謙", "坤"},
 }
 
-func getRecord(context *gin.Context) {
+func GetRecord(context *gin.Context) {
 	fmt.Println("log")
 
 	keys := make([]int, len(database))
@@ -53,7 +53,7 @@ func getRecord(context *gin.Context) {
 	})
 }
 
-func getRecordFrequency(context *gin.Context) {
+func GetRecordFrequency(context *gin.Context) {
 	id, key, ok := checkIdAndTable(context)
 	if !ok {
 		return
@@ -82,7 +82,7 @@ func getRecordFrequency(context *gin.Context) {
 	})
 }
 
-func getChart3d(context *gin.Context) {
+func GetChart3d(context *gin.Context) {
 	id, key, ok := checkIdAndTable(context)
 	if !ok {
 		return
@@ -123,7 +123,7 @@ func checkIdAndTable(context *gin.Context) (int, string, bool) {
 	return id, key, true
 }
 
-func addRecord(context *gin.Context) {
+func AddRecord(context *gin.Context) {
 	var json Record
 	if err := context.ShouldBindJSON(&json); err != nil {
 		context.AbortWithError(http.StatusBadRequest, err)
