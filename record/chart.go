@@ -1,6 +1,7 @@
 package record
 
 import (
+	"../table"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -35,7 +36,7 @@ func GetChartFrequncy(context *gin.Context) {
 	}
 
 	record, ok := database[id]
-	table, ok := tables[key]
+	table, ok := table.GetTable(key)
 	result := getSurface3dChartData(table, record)
 
 	datas := []ChartItem{}
@@ -62,7 +63,7 @@ func GetChartSequence(context *gin.Context) {
 	}
 
 	record, ok := database[id]
-	table, ok := tables[key]
+	table, ok := table.GetTable(key)
 
 	datas := []ChartItem{}
 	colorsLength := len(defaultColors)
@@ -85,7 +86,7 @@ func GetChart3d(context *gin.Context) {
 	}
 
 	record, ok := database[id]
-	table, ok := tables[key]
+	table, ok := table.GetTable(key)
 	datas := getSurface3dChartData(table, record)
 
 	context.JSON(http.StatusOK, gin.H{

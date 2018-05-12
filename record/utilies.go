@@ -19,7 +19,7 @@ func queryInt(key string, context *gin.Context) (int, bool) {
 	return value, true
 }
 
-func getSurface3dChartData(table []float64, record Record) [][]int {
+func getSurface3dChartData(table [6]float64, record Record) [][]int {
 	datas := [][]int{
 		{0, 0, 0, 0, 0, 0, 0, 0},
 		{0, 0, 0, 0, 0, 0, 0, 0},
@@ -39,7 +39,7 @@ func getSurface3dChartData(table []float64, record Record) [][]int {
 	return datas
 }
 
-func mapHexagram(table []float64, data []float64) (int, int) {
+func mapHexagram(table [6]float64, data []float64) (int, int) {
 	above := 0
 	below := 0
 	for i := 0; i < 6; i++ {

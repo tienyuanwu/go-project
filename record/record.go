@@ -1,7 +1,7 @@
 package record
 
 import (
-	"fmt"
+	"../table"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -22,10 +22,6 @@ type HexagramItem struct {
 
 var counter = 0
 var database = map[int]Record{}
-var tables = map[string][]float64{
-	"1": {0.5, 0.5, 0.5, 0.5, 0.5, 0.5},
-	"2": {0.5, 0.5, 50, 50, 50, 50},
-}
 
 var hexagram = [][]string{
 	{"乾", "履", "同人", "無妄", "姤", "訟", "遁", "否"},
@@ -38,9 +34,7 @@ var hexagram = [][]string{
 	{"泰", "臨", "明夷", "復", "升", "師", "謙", "坤"},
 }
 
-func GetRecord(context *gin.Context) {
-	fmt.Println("log")
-
+func Get(context *gin.Context) {
 	keys := make([]int, len(database))
 
 	i := 0
@@ -48,6 +42,7 @@ func GetRecord(context *gin.Context) {
 		keys[i] = k
 		i++
 	}
+
 	context.JSON(http.StatusOK, gin.H{
 		"records": keys,
 	})
@@ -60,7 +55,7 @@ func GetRecordSequence(context *gin.Context) {
 	}
 
 	record, ok := database[id]
-	table, ok := tables[key]
+	table, ok := table.GetTable(key)
 	var array []string
 	for _, item := range record.Datas {
 		above, below := mapHexagram(table, item.Vectors)
@@ -79,7 +74,7 @@ func GetRecordFrequency(context *gin.Context) {
 	}
 
 	record, ok := database[id]
-	table, ok := tables[key]
+	table, ok := table.GetTable(key)
 	datas := getSurface3dChartData(table, record)
 
 	var array []HexagramItem
@@ -119,7 +114,7 @@ func checkIdAndTable(context *gin.Context) (int, string, bool) {
 		return -1, "", false
 	}
 
-	if _, ok := tables[key]; !ok {
+	if _, ok := table.GetTable(key); !ok {
 		context.AbortWithStatus(http.StatusBadRequest)
 		return -1, "", false
 	}
@@ -127,7 +122,7 @@ func checkIdAndTable(context *gin.Context) (int, string, bool) {
 	return id, key, true
 }
 
-func AddRecord(context *gin.Context) {
+func Add(context *gin.Context) {
 	var json Record
 	if err := context.ShouldBindJSON(&json); err != nil {
 		context.AbortWithError(http.StatusBadRequest, err)
