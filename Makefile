@@ -4,6 +4,7 @@ all:
 install_lib:
 	go get github.com/gin-contrib/cors
 	go get github.com/gin-gonic/gin
+	go get github.com/lib/pq
 	go build -o server 
 
 build:
@@ -21,6 +22,9 @@ release:
 
 clean:
 	go clean
+
+run:
+	./server
 
 install:
 	docker build . -t go-gin

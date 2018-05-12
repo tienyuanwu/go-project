@@ -1,4 +1,4 @@
-package main
+package record
 
 import (
 	"github.com/gin-gonic/gin"
