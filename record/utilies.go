@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-func queryInt(key string, context *gin.Context) (int, bool) {
+func queryInt(key string, context *gin.Context) (int64, bool) {
 	str := context.Query(key)
 	if str == "" {
 		return -1, false
@@ -16,7 +16,7 @@ func queryInt(key string, context *gin.Context) (int, bool) {
 		return -1, false
 	}
 
-	return value, true
+	return int64(value), true
 }
 
 func getSurface3dChartData(table [6]float64, record Record) [][]int {

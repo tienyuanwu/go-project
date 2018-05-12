@@ -2,6 +2,7 @@ package main
 
 import (
 	"./record"
+	"./suggestion"
 	"./table"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -20,6 +21,8 @@ func InitRouter(router *gin.Engine) {
 		v1.GET("/record/sequnce", record.GetRecordSequence)
 		v1.GET("/table", table.Get)
 		v1.POST("/table", table.Add)
+		v1.GET("/suggestion", suggestion.Get)
+		v1.POST("/suggestion", suggestion.Add)
 	}
 }
 

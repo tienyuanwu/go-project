@@ -20,8 +20,8 @@ type HexagramItem struct {
 	Value    int    `form:"value" json:"value" binding:"required"`
 }
 
-var counter = 0
-var database = map[int]Record{}
+var counter int64 = 0
+var database = map[int64]Record{}
 
 var hexagram = [][]string{
 	{"乾", "履", "同人", "無妄", "姤", "訟", "遁", "否"},
@@ -35,7 +35,7 @@ var hexagram = [][]string{
 }
 
 func Get(context *gin.Context) {
-	keys := make([]int, len(database))
+	keys := make([]int64, len(database))
 
 	i := 0
 	for k := range database {
@@ -96,27 +96,27 @@ func GetRecordFrequency(context *gin.Context) {
 	})
 }
 
-func checkIdAndTable(context *gin.Context) (int, string, bool) {
+func checkIdAndTable(context *gin.Context) (int64, int64, bool) {
 	id, ok := queryInt("id", context)
 	if !ok {
 		context.AbortWithStatus(http.StatusBadRequest)
-		return -1, "", false
+		return -1, -1, false
 	}
 
 	if _, ok := database[id]; !ok {
 		context.AbortWithStatus(http.StatusBadRequest)
-		return -1, "", false
+		return -1, -1, false
 	}
 
-	key := context.Query("table")
-	if key == "" {
+	key, ok := queryInt("table", context)
+	if !ok {
 		context.AbortWithStatus(http.StatusBadRequest)
-		return -1, "", false
+		return -1, -1, false
 	}
 
 	if _, ok := table.GetTable(key); !ok {
 		context.AbortWithStatus(http.StatusBadRequest)
-		return -1, "", false
+		return -1, -1, false
 	}
 
 	return id, key, true
