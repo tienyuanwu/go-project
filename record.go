@@ -53,6 +53,25 @@ func getRecord(context *gin.Context) {
 	})
 }
 
+func getRecordSequence(context *gin.Context) {
+	id, key, ok := checkIdAndTable(context)
+	if !ok {
+		return
+	}
+
+	record, ok := database[id]
+	table, ok := tables[key]
+	var array []string
+	for _, item := range record.Datas {
+		above, below := mapHexagram(table, item.Vectors)
+		array = append(array, hexagram[above][below])
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"datas": array,
+	})
+}
+
 func getRecordFrequency(context *gin.Context) {
 	id, key, ok := checkIdAndTable(context)
 	if !ok {
