@@ -6,16 +6,16 @@ import (
 )
 
 type Color struct {
-	r int `form:"r" json:"r" binding:"required"`
-	g int `form:"g" json:"g" binding:"required"`
-	b int `form:"b" json:"b" binding:"required"`
+	R int `form:"r" json:"r" binding:"required"`
+	G int `form:"g" json:"g" binding:"required"`
+	B int `form:"b" json:"b" binding:"required"`
 }
 
 type ChartItem struct {
-	x     int   `form:"x" json:"x" binding:"required"`
-	y     int   `form:"y" json:"y" binding:"required"`
-	z     int   `form:"z" json:"z" binding:"required"`
-	color Color `form:"color" json:"color" binding:"required"`
+	X     int   `form:"x" json:"x" binding:"required"`
+	Y     int   `form:"y" json:"y" binding:"required"`
+	Z     int   `form:"z" json:"z" binding:"required"`
+	Color Color `form:"color" json:"color" binding:"required"`
 }
 
 var defaultColors = []Color{
@@ -43,7 +43,7 @@ func GetChartFrequncy(context *gin.Context) {
 	for i, array := range result {
 		for j, value := range array {
 			if value > 0 {
-				color := defaultColors[(i*8+j)/colorsLength]
+				color := defaultColors[(i*8+j)%colorsLength]
 				item := ChartItem{i, j, value, color}
 				datas = append(datas, item)
 			}
@@ -55,7 +55,7 @@ func GetChartFrequncy(context *gin.Context) {
 	})
 }
 
-func GetChartSequnce(context *gin.Context) {
+func GetChartSequence(context *gin.Context) {
 	id, key, ok := checkIdAndTable(context)
 	if !ok {
 		return
@@ -68,7 +68,7 @@ func GetChartSequnce(context *gin.Context) {
 	colorsLength := len(defaultColors)
 	for i, item := range record.Datas {
 		above, below := mapHexagram(table, item.Vectors)
-		color := defaultColors[i/colorsLength]
+		color := defaultColors[i%colorsLength]
 		item := ChartItem{above, below, i, color}
 		datas = append(datas, item)
 	}
