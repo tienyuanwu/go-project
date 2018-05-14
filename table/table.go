@@ -2,7 +2,7 @@ package table
 
 import (
 	"../utility"
-	"fmt"
+	//"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -28,12 +28,12 @@ func GetTable(id int64) ([6]float64, bool) {
 }
 
 func Add(context *gin.Context) {
-	type TableJsonData struct {
+	type JsonType struct {
 		Name string     `form:"name" json:"name" binding:"required"`
 		Data [6]float64 `form:"data" json:"data" binding:"required"`
 	}
 
-	var json TableJsonData
+	var json JsonType
 	if err := context.ShouldBindJSON(&json); err != nil {
 		context.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -63,9 +63,25 @@ func Get(context *gin.Context) {
 		return
 	}
 
-	fmt.Println(table)
 	context.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"data":    table,
+	})
+}
+
+func GetList(context *gin.Context) {
+	type JsonType struct {
+		Id   int64  `form:"id" json:"id" binding:"required"`
+		Name string `form:"name" json:"name" binding:"required"`
+	}
+
+	array := []JsonType{}
+	for _, value := range database {
+		array = append(array, JsonType{value.Id, value.Name})
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    array,
 	})
 }
