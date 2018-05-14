@@ -2,6 +2,7 @@ package record
 
 import (
 	"../table"
+	"../utility"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -97,7 +98,7 @@ func GetRecordFrequency(context *gin.Context) {
 }
 
 func checkIdAndTable(context *gin.Context) (int64, int64, bool) {
-	id, ok := queryInt("id", context)
+	id, ok := utility.QueryInt("id", context)
 	if !ok {
 		context.AbortWithStatus(http.StatusBadRequest)
 		return -1, -1, false
@@ -108,7 +109,7 @@ func checkIdAndTable(context *gin.Context) (int64, int64, bool) {
 		return -1, -1, false
 	}
 
-	key, ok := queryInt("table", context)
+	key, ok := utility.QueryInt("table", context)
 	if !ok {
 		context.AbortWithStatus(http.StatusBadRequest)
 		return -1, -1, false

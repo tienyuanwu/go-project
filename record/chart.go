@@ -93,3 +93,23 @@ func GetChart3d(context *gin.Context) {
 		"datas": datas,
 	})
 }
+
+func getSurface3dChartData(table [6]float64, record Record) [][]int {
+	datas := [][]int{
+		{0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0},
+	}
+
+	for _, item := range record.Datas {
+		above, below := mapHexagram(table, item.Vectors)
+		datas[above][below] += 1
+	}
+
+	return datas
+}
