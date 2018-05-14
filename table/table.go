@@ -10,7 +10,7 @@ import (
 type Table struct {
 	Id   int64      `form:"id" json:"id" binding:"required"`
 	Name string     `form:"name" json:"name" binding:"required"`
-	Data [6]float64 `form:"datas" json:"datas" binding:"required"`
+	Data [6]float64 `form:"data" json:"data" binding:"required"`
 }
 
 var counter int64 = 1

@@ -37,7 +37,7 @@ func GetChartFrequncy(context *gin.Context) {
 
 	record, ok := database[id]
 	table, ok := table.GetTable(key)
-	result := getSurface3dChartData(table, record)
+	result := getSurface3dChartData(record, table)
 
 	datas := []ChartItem{}
 	colorsLength := len(defaultColors)
@@ -87,15 +87,15 @@ func GetChart3d(context *gin.Context) {
 
 	record, ok := database[id]
 	table, ok := table.GetTable(key)
-	datas := getSurface3dChartData(table, record)
+	datas := getSurface3dChartData(record, table)
 
 	context.JSON(http.StatusOK, gin.H{
 		"datas": datas,
 	})
 }
 
-func getSurface3dChartData(table [6]float64, record Record) [][]int {
-	datas := [][]int{
+func getSurface3dChartData(record Record, table [6]float64) [8][8]int {
+	datas := [8][8]int{
 		{0, 0, 0, 0, 0, 0, 0, 0},
 		{0, 0, 0, 0, 0, 0, 0, 0},
 		{0, 0, 0, 0, 0, 0, 0, 0},

@@ -1,8 +1,12 @@
 package suggestion
 
 import (
+	"../record"
+	"../utility"
+	//"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"sort"
 )
 
 const (
@@ -15,7 +19,7 @@ type Suggestion struct {
 	Id   int64             `form:"id" json:"id" binding:"required"`
 	Name string            `form:"name" json:"name" binding:"required"`
 	Type string            `form:"type" json:"type" binding:"required"`
-	Data map[string]string `form:"datas" json:"datas" binding:"required"`
+	Data map[string]string `form:"data" json:"data" binding:"required"`
 }
 
 var counter int64 = 2
@@ -86,7 +90,7 @@ var database = map[int64]Suggestion{
 		"既濟": "既濟，亨小，利貞。初吉終亂。",
 		"未濟": "未濟，亨。小狐汔濟，濡其尾，無攸利。",
 	}},
-	2: Suggestion{2, "Default 64", SuggestionType64, map[string]string{
+	2: Suggestion{2, "Default 4", SuggestionType4, map[string]string{
 		"乾": "乾，元亨利貞。",
 		"坤": "元亨，利牝馬之貞。君子有攸往，先迷，後得主利。西南得朋，東北喪朋，安貞吉。",
 		"泰": "泰，小往大來，吉亨。",
@@ -95,10 +99,151 @@ var database = map[int64]Suggestion{
 }
 
 func Add(context *gin.Context) {
+	type JsonType struct {
+		Name string            `form:"name" json:"name" binding:"required"`
+		Type string            `form:"type" json:"type" binding:"required"`
+		Data map[string]string `form:"data" json:"data" binding:"required"`
+	}
 
+	var json JsonType
+	if err := context.ShouldBindJSON(&json); err != nil {
+		context.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	if json.Type != SuggestionType4 && json.Type != SuggestionType64 {
+		context.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	if json.Type == SuggestionType4 {
+		table := []string{"乾", "坤", "泰", "否"}
+		for _, key := range table {
+			_, ok := json.Data[key]
+			if !ok {
+				context.AbortWithStatus(http.StatusBadRequest)
+				return
+			}
+		}
+	}
+
+	if json.Type == SuggestionType64 {
+		table := utility.GetHexagramSequenceTable()
+		for _, key := range table {
+			_, ok := json.Data[key]
+			if !ok {
+				context.AbortWithStatus(http.StatusBadRequest)
+				return
+			}
+		}
+	}
+
+	counter += 1
+	suggestion := Suggestion{counter, json.Name, json.Type, json.Data}
+	database[counter] = suggestion
+
+	context.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"id":      counter,
+	})
 }
 
 func Get(context *gin.Context) {
+	recordId, ok := utility.QueryInt("record", context)
+	if !ok {
+		context.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	tableId, ok := utility.QueryInt("table", context)
+	if !ok {
+		context.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	suggestionId, ok := utility.QueryInt("suggestion", context)
+	if !ok {
+		context.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	table, ok := database[suggestionId]
+	if !ok {
+		context.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	if table.Type != SuggestionType64 && table.Type != SuggestionType4 {
+		context.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	suggestionArray := []string{}
+	if table.Type == SuggestionType64 {
+		array, ok := record.GetRecordFrequencyArray(recordId, tableId)
+		if !ok {
+			context.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
+
+		sort.Slice(array, func(i, j int) bool {
+			return array[i].Value > array[j].Value // 降序
+		})
+		if table.Type == SuggestionType64 {
+			for i, _ := range array {
+				suggestionArray = append(suggestionArray, table.Data[array[i].Hexagram])
+				if i >= 2 {
+					break
+				}
+			}
+		}
+	} else {
+		summary := map[string]int{"乾": 0, "坤": 0, "泰": 0, "否": 0}
+		freqTable, ok := record.GetFrequencyTable(recordId, tableId)
+		if !ok {
+			context.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
+		for i, array := range freqTable {
+			for j, value := range array {
+				if value == 0 {
+					continue
+				}
+				if i < 4 {
+					if j < 4 {
+						summary["乾"] += value
+					} else {
+						summary["否"] += value
+					}
+				} else {
+					if j < 4 {
+						summary["泰"] += value
+					} else {
+						summary["坤"] += value
+					}
+				}
+			}
+		}
+
+		maxKey := ""
+		maxValue := 0
+		for key, value := range summary {
+			if maxValue > value {
+				continue
+			}
+
+			maxKey = key
+			maxValue = value
+		}
+
+		suggestionArray = append(suggestionArray, table.Data[maxKey])
+
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    suggestionArray,
+	})
 }
 
 func GetList(context *gin.Context) {

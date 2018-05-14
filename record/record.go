@@ -24,15 +24,48 @@ type HexagramItem struct {
 var counter int64 = 0
 var database = map[int64]Record{}
 
-var hexagram = [][]string{
-	{"乾", "履", "同人", "無妄", "姤", "訟", "遁", "否"},
-	{"夬", "兑", "革", "隨", "大過", "困", "咸", "萃"},
-	{"大有", "睽", "離", "噬嗑", "鼎", "未濟", "旅", "晉"},
-	{"大壯", "歸妹", "豐", "震", "恆", "解", "小過", "豫"},
-	{"小畜", "中孚", "家人", "益", "巽", "渙", "漸", "觀"},
-	{"需", "節", "既濟", "屯", "井", "坎", "蹇", "比"},
-	{"大畜", "損", "賁", "頤", "蠱", "蒙", "艮", "剝"},
-	{"泰", "臨", "明夷", "復", "升", "師", "謙", "坤"},
+func GetFrequencyTable(recordId int64, tableId int64) ([8][8]int, bool) {
+	record, ok := database[recordId]
+	if !ok {
+		return [8][8]int{}, false
+	}
+
+	table, ok := table.GetTable(tableId)
+	if !ok {
+		return [8][8]int{}, false
+	}
+
+	return getSurface3dChartData(record, table), true
+}
+
+func GetRecordFrequencyArray(recordId int64, tableId int64) ([]HexagramItem, bool) {
+	record, ok := database[recordId]
+	if !ok {
+		return []HexagramItem{}, false
+	}
+
+	table, ok := table.GetTable(tableId)
+	if !ok {
+		return []HexagramItem{}, false
+	}
+
+	datas := getSurface3dChartData(record, table)
+
+	var array []HexagramItem
+	for i := 0; i < 8; i++ {
+		for j := 0; j < 8; j++ {
+			if datas[i][j] == 0 {
+				continue
+			}
+			item := HexagramItem{
+				Hexagram: utility.GetHexagramPostionTable()[i][j],
+				Value:    datas[i][j],
+			}
+			array = append(array, item)
+		}
+	}
+
+	return array, true
 }
 
 func Get(context *gin.Context) {
@@ -60,7 +93,7 @@ func GetRecordSequence(context *gin.Context) {
 	var array []string
 	for _, item := range record.Datas {
 		above, below := mapHexagram(table, item.Vectors)
-		array = append(array, hexagram[above][below])
+		array = append(array, utility.GetHexagramPostionTable()[above][below])
 	}
 
 	context.JSON(http.StatusOK, gin.H{
@@ -69,27 +102,22 @@ func GetRecordSequence(context *gin.Context) {
 }
 
 func GetRecordFrequency(context *gin.Context) {
-	id, key, ok := checkIdAndTable(context)
+	recordId, ok := utility.QueryInt("record", context)
 	if !ok {
+		context.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
-	record, ok := database[id]
-	table, ok := table.GetTable(key)
-	datas := getSurface3dChartData(table, record)
+	tableId, ok := utility.QueryInt("table", context)
+	if !ok {
+		context.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
 
-	var array []HexagramItem
-	for i := 0; i < 8; i++ {
-		for j := 0; j < 8; j++ {
-			if datas[i][j] == 0 {
-				continue
-			}
-			item := HexagramItem{
-				Hexagram: hexagram[i][j],
-				Value:    datas[i][j],
-			}
-			array = append(array, item)
-		}
+	array, ok := GetRecordFrequencyArray(recordId, tableId)
+	if !ok {
+		context.AbortWithStatus(http.StatusBadRequest)
+		return
 	}
 
 	context.JSON(http.StatusOK, gin.H{
@@ -98,7 +126,7 @@ func GetRecordFrequency(context *gin.Context) {
 }
 
 func checkIdAndTable(context *gin.Context) (int64, int64, bool) {
-	id, ok := utility.QueryInt("id", context)
+	id, ok := utility.QueryInt("record", context)
 	if !ok {
 		context.AbortWithStatus(http.StatusBadRequest)
 		return -1, -1, false
