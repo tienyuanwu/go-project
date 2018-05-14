@@ -28,6 +28,7 @@ func InitRouter(router *gin.Engine) {
 
 		v1.GET("/suggestion", suggestion.Get)
 		v1.POST("/suggestion", suggestion.Add)
+		v1.GET("/suggestion/list", suggestion.GetList)
 	}
 }
 
