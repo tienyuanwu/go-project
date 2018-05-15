@@ -3,7 +3,7 @@ package suggestion
 import (
 	"../record"
 	"../utility"
-	//"fmt"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"sort"
@@ -190,8 +190,9 @@ func Get(context *gin.Context) {
 			return array[i].Value > array[j].Value // 降序
 		})
 		if table.Type == SuggestionType64 {
-			for i, _ := range array {
-				suggestionArray = append(suggestionArray, table.Data[array[i].Hexagram])
+			for i, value := range array {
+				fmt.Println(i, value)
+				suggestionArray = append(suggestionArray, table.Data[value.Hexagram])
 				if i >= 2 {
 					break
 				}
