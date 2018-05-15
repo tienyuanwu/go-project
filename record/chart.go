@@ -41,13 +41,16 @@ func GetChartFrequncy(context *gin.Context) {
 
 	datas := []ChartItem{}
 	colorsLength := len(defaultColors)
+	colorIndex := 0
 	for i, array := range result {
 		for j, value := range array {
-			if value > 0 {
-				color := defaultColors[(i*8+j)%colorsLength]
-				item := ChartItem{i, j, value, color}
-				datas = append(datas, item)
+			if value == 0 {
+				continue
 			}
+			color := defaultColors[colorIndex%colorsLength]
+			item := ChartItem{i, j, value, color}
+			datas = append(datas, item)
+			colorIndex += 1
 		}
 	}
 
